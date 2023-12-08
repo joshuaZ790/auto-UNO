@@ -1,0 +1,47 @@
+#include <Wire.h>
+ #include "DHT.h"
+ // Configuración del sensor ultrasónico const int trigPin = 9;
+ const int echoPin = 10;
+ // Configuración del sensor de temperatura y humedad const int DHTPIN = 2;
+ const int DHTTYPE = DHT11;
+ // Variables globales 
+DHT dht(DHTPIN, DHTTYPE);
+ // Variables para almacenar los datos de los sensores 
+float distancia;
+ float temperatura;
+ float humedad;
+ // Función para leer la distancia del sensor ultrasónico
+ float leerDistancia() { 
+// Enviar un pulso de 10 microsegundos al pin 
+Trig digitalWrite(trigPin, HIGH);
+ delayMicroseconds(10);
+ digitalWrite(trigPin, LOW);
+ // Medir el tiempo que tarda en regresar el pulso
+ long tiempo = pulseIn(echoPin, HIGH);
+ // Calcular la distancia en centímetros 
+distancia = tiempo * 0.034 / 2; 
+return distancia;
+ } 
+void setup() {
+ // Inicializar el puerto serie a 9600 baudios 
+Serial.begin(9600); 
+// Inicializar el sensor ultrasónico 
+pinMode(trigPin, OUTPUT);
+ pinMode(echoPin, INPUT);
+ // Inicializar el sensor de temperatura y humedad 
+dht.begin();
+ } 
+void loop() {
+ // Leer la distancia del sensor ultrasónico 
+distancia = leerDistancia();
+ // Leer la temperatura y humedad del sensor de temperatura y humedad 
+temperatura = dht.readTemperature();
+ humedad = dht.readHumidity(); 
+// Controlar el estado de las alarmas
+ if (temperatura > 100 || distancia < 7) 
+{ // Enviar una notificación 
+Serial.println("Se ha activado una alarma");
+ }
+ // Esperar un segundo antes de volver a leer los sensores
+ delay(1000);
+ }
